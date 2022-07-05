@@ -1,0 +1,13 @@
+{
+  "$id": "https://example.com/address.schema.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "UUID Request",
+  "description": "Username to UUID converter",
+  "type": "object",
+  "properties": {
+    "username": {
+      "description": "Username of the player for the UUID retrieval",
+      "type": "string"
+    }
+  }
+}
