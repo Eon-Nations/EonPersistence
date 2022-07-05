@@ -7,19 +7,16 @@ import main.request.UpdateBalanceRequest;
 import main.request.UpdateBalanceResponse;
 import main.request.UpdateJobRequest;
 import main.request.UpdateJobResponse;
-import main.uuid.UUIDRequest;
 import main.uuid.UUIDResponse;
 import main.uuid.UUIDRetrieval;
 import spark.Request;
 import spark.Response;
 import utils.RequestStatus;
 
-import java.util.logging.Logger;
-
 public class Routing {
     private Routing() { }
     private static final int EVERYTHING_WORKED_HTTP = 200;
-    private static final Logger logger = Logger.getLogger("Routing");
+
 
     private static void setupResponse(Response response) {
         response.type("application/json");
@@ -33,8 +30,8 @@ public class Routing {
     public static String handleUUIDRequest(Request request, Response response) {
         setupResponse(response);
         Gson gson = new Gson();
-        UUIDRequest uuidRequest = gson.fromJson(request.body(), UUIDRequest.class);
-        String uuidString = UUIDRetrieval.retrieveUUID(uuidRequest.username());
+        String username = request.params(":username");
+        String uuidString = UUIDRetrieval.retrieveUUID(username);
         UUIDResponse uuidResponse = new UUIDResponse(uuidString);
         return gson.toJson(uuidResponse);
     }
@@ -48,8 +45,8 @@ public class Routing {
 
     public static String retrievePlayer(Request request, Response response) {
         setupResponse(response);
-        PlayerRequest playerRequest = obtainPlayerRequest(request);
-        EonPlayer eonPlayer = Database.retrievePlayer(playerRequest.uuid());
+        String uuidString = request.params(":uuid");
+        EonPlayer eonPlayer = Database.retrievePlayer(uuidString);
         return new Gson().toJson(eonPlayer);
     }
 
@@ -70,8 +67,8 @@ public class Routing {
 
     public static String retrieveJob(Request request, Response response) {
         setupResponse(response);
-        PlayerRequest playerRequest = obtainPlayerRequest(request);
-        EonPlayer eonPlayer = Database.retrievePlayer(playerRequest.uuid());
+        String uuidString = request.params(":uuid");
+        EonPlayer eonPlayer = Database.retrievePlayer(uuidString);
         return new Gson().toJson(eonPlayer.job());
     }
 

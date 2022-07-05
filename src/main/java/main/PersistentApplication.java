@@ -10,24 +10,24 @@ public class PersistentApplication {
     public static void main(String[] args) {
         setupServerConfiguration();
         before("/*", (req, res) -> logger.info("Received API call"));
-        get("/uuid", Routing::handleUUIDRequest);
+        get("/uuid/:username", Routing::handleUUIDRequest);
         registerPlayerEndpoints();
         registerBalanceEndpoints();
         registerJobEndpoints();
     }
 
     private static void registerPlayerEndpoints() {
-        get("/player", Routing::retrievePlayer);
+        get("/player/:uuid", Routing::retrievePlayer);
         post("/player", Routing::updatePlayer);
     }
 
     private static void registerBalanceEndpoints() {
-        get("/balance", Routing::retrieveBalance);
+        get("/balance/:uuid", Routing::retrieveBalance);
         post("/balance", Routing::updateBalance);
     }
 
     private static void registerJobEndpoints() {
-        get("/job", Routing::retrieveJob);
+        get("/job/:uuid", Routing::retrieveJob);
         post("/job", Routing::updateJob);
     }
 
