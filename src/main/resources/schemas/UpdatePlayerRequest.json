@@ -1,0 +1,25 @@
+{
+  "$id": "https://example.com/address.schema.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "UUID Request",
+  "description": "Username to UUID converter",
+  "type": "object",
+  "properties": {
+    "uuidString": {
+      "description": "UUID in String format",
+      "type": "string"
+    },
+    "balance": {
+      "description": "New balance of the player",
+      "type": "number"
+    },
+    "job": {
+      "description": "New job of the player",
+      "type": "object"
+    },
+    "playtime": {
+      "description": "Milliseconds of time played",
+      "type": "number"
+    }
+  }
+}

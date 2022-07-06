@@ -1,58 +1,45 @@
-import main.PersistentApplication;
-import org.junit.jupiter.api.*;
-import spark.Spark;
+import org.json.JSONObject;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
-class TestPersistentApplication {
-
-    @BeforeAll
-    static void startServer() {
-        PersistentApplication.main(new String[0]);
-    }
-
-    @BeforeEach
-    void waitForStart() {
-        Spark.awaitInitialization();
-    }
-
-    private static HttpResponse<String> sendRequest(String endPoint, String requestBody, String extraParam) {
-        final String BASE_URL = "http://localhost:35353";
-        HttpRequest request;
-        try {
-            HttpRequest.Builder builder = HttpRequest.newBuilder(new URI(BASE_URL + "/" + endPoint + "/" + extraParam));
-            builder = requestBody.isEmpty() ? builder.GET() : builder.POST(HttpRequest.BodyPublishers.ofString(requestBody));
-            request = builder.build();
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-            return null;
-        }
-        HttpClient client = HttpClient.newHttpClient();
-        return client.sendAsync(request, HttpResponse.BodyHandlers.ofString()).join();
-    }
-
-    private static HttpResponse<String> sendGetRequest(String endPoint, String extraParam) {
-        return sendRequest(endPoint, "", extraParam);
-    }
-
-    private static HttpResponse<String> sendPostRequest(String endPoint, String requestBody) {
-        return sendRequest(endPoint, requestBody, "");
-    }
+class TestPersistentApplication extends SparkBase {
+    private static final int HTTP_INVALID = 404;
+    private static final int HTTP_INVALID_REQ = 400;
+    private static final int HTTP_OK = 200;
 
     @Test
     @DisplayName("Request leading nowhere responds with 404 status")
     void test404() {
         HttpResponse<String> response = sendGetRequest("invalid", "invalid");
-        Assertions.assertEquals(404, response.statusCode());
+        Assertions.assertEquals(HTTP_INVALID, response.statusCode());
     }
 
-    @AfterAll
-    static void shutdownServer() {
-        Spark.stop();
-        Spark.awaitStop();
+    @Test
+    @DisplayName("An invalid JSON gets detected and is sent back as a 400 error code")
+    void testInvalidJSON() {
+        String requestBody = "{ \"nice\":}";
+        HttpResponse<String> response = sendPostRequest("player", requestBody);
+        Assertions.assertEquals(HTTP_INVALID_REQ, response.statusCode());
+    }
+
+    @Test
+    @DisplayName("Valid GET request comes back as a 200 status code")
+    void testValidRequest() {
+        HttpResponse<String> response = sendGetRequest("uuid", "C4Squid");
+        Assertions.assertEquals(HTTP_OK, response.statusCode());
+    }
+
+    @Test
+    @DisplayName("Valid POST request comes back as a 200 status code")
+    void testValidPost() {
+        String requestBody = new JSONObject()
+                .put("uuid", "C4Squid")
+                .put("balance", 0.0)
+                .toString();
+        HttpResponse<String> response = sendPostRequest("balance", requestBody);
+        Assertions.assertEquals(HTTP_OK, response.statusCode());
     }
 }

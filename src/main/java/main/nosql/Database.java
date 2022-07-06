@@ -38,6 +38,8 @@ public class Database {
 
     public static RequestStatus updateJob(String uuidString, Job job) { return RequestStatus.UNIMPLEMENTED; }
 
+    public static RequestStatus updatePlayer(EonPlayer eonPlayer) { return RequestStatus.UNIMPLEMENTED; }
+
     public static void closeNoSQLHandle(NoSQLHandle noSQLHandle) {
         noSQLHandle.close();
     }
